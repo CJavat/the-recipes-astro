@@ -1,0 +1,9 @@
+---
+interface Props {
+  classStyle?: string;
+}
+
+const { classStyle } = Astro.props;
+---
+
+<img src="/spinner.svg" alt="loading..." class={classStyle} />
