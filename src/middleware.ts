@@ -4,17 +4,12 @@ const privateRoutes = ["/dashboard"];
 const notAuthenticatedRoutes = ["/auth"];
 
 export const onRequest = defineMiddleware((context, next) => {
-  const { url, request, locals, redirect } = context;
+  const { url, request, locals, redirect, cookies } = context;
 
-  console.log({ cookies: request.headers.get("cookies") });
+  console.log(cookies.get("token")?.value);
+  const token = cookies.get("token")?.value;
 
-  const token = request.headers
-    .get("cookies")
-    ?.split(";")
-    .find((cookie) => cookie.trim().startsWith("token="));
-
-  const tokenValue = token?.split("=")[1];
-  const isLoggedIn = !!tokenValue;
+  const isLoggedIn = !!token;
 
   //TODO: Agregar datos del usuario.
   // const user = ;
@@ -26,14 +21,15 @@ export const onRequest = defineMiddleware((context, next) => {
   //   }
   // }
 
-  if (!isLoggedIn && url.pathname === "/") return redirect("/auth");
-  else if (isLoggedIn && url.pathname === "/") return redirect("/dashboard");
+  //TODO: Revisar porque falla si lo descomento
+  // if (!isLoggedIn && url.pathname === "/") return redirect("/auth");
+  // else if (isLoggedIn && url.pathname === "/") return redirect("/dashboard");
 
-  if (!isLoggedIn && privateRoutes.includes(url.pathname))
-    return redirect("/auth");
+  // if (!isLoggedIn && privateRoutes.includes(url.pathname))
+  //   return redirect("/auth");
 
-  if (isLoggedIn && notAuthenticatedRoutes.includes(url.pathname))
-    return redirect("/dashboard");
+  // if (isLoggedIn && notAuthenticatedRoutes.includes(url.pathname))
+  //   return redirect("/dashboard");
 
   return next();
 });
