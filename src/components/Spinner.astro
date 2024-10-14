@@ -1,9 +1,9 @@
 ---
 interface Props {
-  classStyle?: string;
+  class?: string;
 }
 
-const { classStyle } = Astro.props;
+const { class: className } = Astro.props;
 ---
 
-<img src="/spinner.svg" alt="loading..." class={classStyle} />
+<img src="/spinner.svg" alt="loading..." class={className} />
