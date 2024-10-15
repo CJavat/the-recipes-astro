@@ -1,5 +1,6 @@
-import { defineAction } from "astro:actions";
+import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro/zod";
+import type { User } from "../../interface";
 
 export const login = defineAction({
   accept: "form",
@@ -16,22 +17,33 @@ export const login = defineAction({
         },
         body: JSON.stringify({ email, password }),
       });
-      const data = await response.json();
+      const user = (await response.json()) as User;
 
-      // En el método de inicio de sesión
-      if (data && data.token) {
-        context.cookies.set("token", data.token, {
-          maxAge: 60 * 60 * 24 * 7,
-          httpOnly: true,
-          path: "/",
-        });
-        console.log("Cookie establecida:", data.token);
+      if ("message" in user) {
+        throw new Error(
+          Array.isArray(user.message) ? user.message[0] : user.message
+        );
       }
 
-      return data;
+      context.cookies.set("user", user, {
+        maxAge: 60 * 60 * 24 * 7,
+        httpOnly: true,
+        path: "/",
+      });
+      context.cookies.set("token", user.token, {
+        maxAge: 60 * 60 * 24 * 7,
+        httpOnly: true,
+        path: "/",
+      });
+
+      return user;
     } catch (error) {
       console.log(error);
-      throw error;
+      if (error instanceof Error) {
+        console.log(error.message);
+        throw new Error(error.message);
+      }
+      throw new Error(error as string);
     }
   },
 });

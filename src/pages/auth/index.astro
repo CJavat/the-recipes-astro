@@ -3,13 +3,6 @@ import { Image } from "astro:assets";
 
 import AuthLayout from "../../layouts/AuthLayout.astro";
 import Spinner from "../../components/Spinner.astro";
-
-// export const prerender = false;
-
-// Al iniciar sesión
-// document.cookie = `token=${token}; path=/; secure; samesite=strict`;
-
-// const isLoading = false;
 ---
 
 <AuthLayout>
@@ -117,6 +110,7 @@ import Spinner from "../../components/Spinner.astro";
 </AuthLayout>
 
 <script>
+  import { ActionError } from "astro:actions";
   import { actions } from "astro:actions";
   import Swal from "sweetalert2";
 
@@ -158,26 +152,22 @@ import Spinner from "../../components/Spinner.astro";
     const formData = new FormData(form);
     const { data, error } = await actions.login(formData);
 
-    console.log(data);
-
-    if (data?.statusCode === 404 || data?.statusCode === 400) {
-      Swal.fire("Error", data.message[0], "error");
-      loginbtn?.removeAttribute("disabled");
-      spinner?.classList.toggle("hidden");
-      titleBtn?.classList.toggle("hidden");
-      return;
-    }
     if (error) {
-      Swal.fire("Error", "Ocurrió un error desonocido", "error");
       loginbtn?.removeAttribute("disabled");
       spinner?.classList.toggle("hidden");
       titleBtn?.classList.toggle("hidden");
+      if (error instanceof ActionError) {
+        Swal.fire("Error", error.message, "error");
+        return;
+      }
+
+      Swal.fire("Error", error, "error");
       return;
     }
 
     loginbtn?.removeAttribute("disabled");
     spinner?.classList.toggle("hidden");
     titleBtn?.classList.toggle("hidden");
-    // return (window.location.href = "/dashboard");
+    return (window.location.href = "/dashboard");
   });
 </script>
