@@ -18,13 +18,14 @@ export const login = defineAction({
       });
       const data = await response.json();
 
+      // En el método de inicio de sesión
       if (data && data.token) {
         context.cookies.set("token", data.token, {
-          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          maxAge: 60 * 60 * 24 * 7,
+          httpOnly: true,
           path: "/",
-          // secure: true, // Comentar esta línea si no estás en HTTPS
-          // httpOnly: true, // Comentar si necesitas acceso desde JavaScript
         });
+        console.log("Cookie establecida:", data.token);
       }
 
       return data;

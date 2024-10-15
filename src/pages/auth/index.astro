@@ -4,7 +4,7 @@ import { Image } from "astro:assets";
 import AuthLayout from "../../layouts/AuthLayout.astro";
 import Spinner from "../../components/Spinner.astro";
 
-export const prerender = false;
+// export const prerender = false;
 
 // Al iniciar sesión
 // document.cookie = `token=${token}; path=/; secure; samesite=strict`;
@@ -158,7 +158,9 @@ export const prerender = false;
     const formData = new FormData(form);
     const { data, error } = await actions.login(formData);
 
-    if (data?.statusCode === 404) {
+    console.log(data);
+
+    if (data?.statusCode === 404 || data?.statusCode === 400) {
       Swal.fire("Error", data.message[0], "error");
       loginbtn?.removeAttribute("disabled");
       spinner?.classList.toggle("hidden");
@@ -176,7 +178,6 @@ export const prerender = false;
     loginbtn?.removeAttribute("disabled");
     spinner?.classList.toggle("hidden");
     titleBtn?.classList.toggle("hidden");
-    //TODO: ver porque eso elimina las cookies return (window.location.href = "/dashboard");
-    // CADA QUE RECARGO SE ELMINA LAS COOKIES
+    // return (window.location.href = "/dashboard");
   });
 </script>
